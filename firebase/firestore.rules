@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn();
+      allow create, update: if isSelf(userId);
+    }
+
+    match /horses/{horseId} {
+      allow read: if signedIn();
+      allow create, update, delete: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid;
+    }
+
+    match /vetProfiles/{vetId} {
+      allow read: if signedIn();
+      allow write: if isSelf(vetId);
+    }
+
+    match /services/{serviceId} {
+      allow read: if signedIn();
+      allow write: if signedIn()
+        && request.resource.data.vetId == request.auth.uid;
+    }
+
+    match /availability/{slotId} {
+      allow read: if signedIn();
+      allow write: if signedIn()
+        && request.resource.data.vetId == request.auth.uid;
+    }
+
+    match /bookings/{bookingId} {
+      allow read: if signedIn()
+        && (resource.data.ownerId == request.auth.uid
+            || resource.data.vetId == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.rateConfirmedByOwner == true;
+      allow update: if signedIn()
+        && (resource.data.ownerId == request.auth.uid
+            || resource.data.vetId == request.auth.uid);
+    }
+  }
+}

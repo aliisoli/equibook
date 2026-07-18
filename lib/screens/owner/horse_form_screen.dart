@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
@@ -54,6 +55,7 @@ class _HorseFormScreenState extends State<HorseFormScreen> {
   }
 
   Future<String> _persistFile(String sourcePath, String prefix) async {
+    if (kIsWeb) return sourcePath;
     final dir = await getApplicationDocumentsDirectory();
     final mediaDir = Directory(p.join(dir.path, 'media'));
     if (!await mediaDir.exists()) await mediaDir.create(recursive: true);

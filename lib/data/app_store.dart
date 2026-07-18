@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/models.dart';
@@ -12,6 +10,7 @@ class AppStore extends ChangeNotifier {
   AppStore();
 
   static const _uuid = Uuid();
+  static const _storageKey = 'equibook_local_v1';
   static const _demoVetEmail = 'vet@equibook.demo';
   static const _demoOwnerEmail = 'owner@equibook.demo';
   static const _demoPassword = 'demo1234';
@@ -44,66 +43,65 @@ class AppStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<File> _dbFile() async {
-    final dir = await getApplicationDocumentsDirectory();
-    return File(p.join(dir.path, 'equibook_local.json'));
+  void _hydrate(Map<String, dynamic> data) {
+    users
+      ..clear()
+      ..addAll(
+        (data['users'] as List? ?? []).map(
+          (e) => AppUser.fromJson(e as Map<String, dynamic>),
+        ),
+      );
+    horses
+      ..clear()
+      ..addAll(
+        (data['horses'] as List? ?? []).map(
+          (e) => Horse.fromJson(e as Map<String, dynamic>),
+        ),
+      );
+    vetProfiles
+      ..clear()
+      ..addAll(
+        (data['vetProfiles'] as List? ?? []).map(
+          (e) => VetProfile.fromJson(e as Map<String, dynamic>),
+        ),
+      );
+    services
+      ..clear()
+      ..addAll(
+        (data['services'] as List? ?? []).map(
+          (e) => ServiceOffering.fromJson(e as Map<String, dynamic>),
+        ),
+      );
+    slots
+      ..clear()
+      ..addAll(
+        (data['slots'] as List? ?? []).map(
+          (e) => AvailabilitySlot.fromJson(e as Map<String, dynamic>),
+        ),
+      );
+    bookings
+      ..clear()
+      ..addAll(
+        (data['bookings'] as List? ?? []).map(
+          (e) => Booking.fromJson(e as Map<String, dynamic>),
+        ),
+      );
+    currentUserId = data['currentUserId'] as String?;
   }
 
   Future<void> _load() async {
     try {
-      final file = await _dbFile();
-      if (!await file.exists()) return;
-      final data = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-      users
-        ..clear()
-        ..addAll(
-          (data['users'] as List? ?? []).map(
-            (e) => AppUser.fromJson(e as Map<String, dynamic>),
-          ),
-        );
-      horses
-        ..clear()
-        ..addAll(
-          (data['horses'] as List? ?? []).map(
-            (e) => Horse.fromJson(e as Map<String, dynamic>),
-          ),
-        );
-      vetProfiles
-        ..clear()
-        ..addAll(
-          (data['vetProfiles'] as List? ?? []).map(
-            (e) => VetProfile.fromJson(e as Map<String, dynamic>),
-          ),
-        );
-      services
-        ..clear()
-        ..addAll(
-          (data['services'] as List? ?? []).map(
-            (e) => ServiceOffering.fromJson(e as Map<String, dynamic>),
-          ),
-        );
-      slots
-        ..clear()
-        ..addAll(
-          (data['slots'] as List? ?? []).map(
-            (e) => AvailabilitySlot.fromJson(e as Map<String, dynamic>),
-          ),
-        );
-      bookings
-        ..clear()
-        ..addAll(
-          (data['bookings'] as List? ?? []).map(
-            (e) => Booking.fromJson(e as Map<String, dynamic>),
-          ),
-        );
-      currentUserId = data['currentUserId'] as String?;
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_storageKey);
+      if (raw == null) return;
+      _hydrate(jsonDecode(raw) as Map<String, dynamic>);
     } catch (_) {
-      // Corrupt local file — start fresh.
+      // Corrupt local data — start fresh.
     }
   }
 
   Future<void> _save() async {
-    final file = await _dbFile();
+    final prefs = await SharedPreferences.getInstance();
     final payload = {
       'currentUserId': currentUserId,
       'users': users.map((e) => e.toJson()).toList(),
@@ -113,7 +111,7 @@ class AppStore extends ChangeNotifier {
       'slots': slots.map((e) => e.toJson()).toList(),
       'bookings': bookings.map((e) => e.toJson()).toList(),
     };
-    await file.writeAsString(const JsonEncoder.withIndent('  ').convert(payload));
+    await prefs.setString(_storageKey, jsonEncode(payload));
   }
 
   void _seedDemo() {

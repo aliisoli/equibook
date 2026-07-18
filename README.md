@@ -26,15 +26,24 @@ Already installed for this project workspace where possible:
 3. Inside Android Studio: install the **Android SDK**, accept licenses, and create a **Virtual Device** (emulator)
 4. (Later for iPhone) **Xcode** from the Mac App Store
 
-## Run on an Android emulator
+## Run it now (easiest: Chrome)
 
-1. Open **Android Studio** once and finish the setup wizard (SDK + device manager).
-2. Start an emulator: Device Manager → Play on a virtual phone.
-3. From this project:
+Android Studio is installed, but the Android SDK still needs a first-time setup. Until then you can try the full app in Chrome:
 
 ```bash
 cd ~/Projects/equibook
 flutter pub get
+flutter run -d chrome
+```
+
+## Run on an Android emulator
+
+1. Open **Android Studio** once and finish the setup wizard (install Android SDK).
+2. Device Manager → create a virtual phone → press Play.
+3. Then:
+
+```bash
+cd ~/Projects/equibook
 flutter doctor
 flutter run
 ```

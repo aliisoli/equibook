@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -101,17 +102,26 @@ class LocalImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final file = path == null ? null : File(path!);
-    final hasFile = file != null && file.existsSync();
+    Widget child = Icon(fallbackIcon, color: AppTheme.moss);
+    if (path != null && path!.isNotEmpty) {
+      if (kIsWeb || path!.startsWith('http') || path!.startsWith('blob:')) {
+        child = Image.network(path!, fit: BoxFit.cover, errorBuilder: (_, _, _) {
+          return Icon(fallbackIcon, color: AppTheme.moss);
+        });
+      } else {
+        final file = File(path!);
+        if (file.existsSync()) {
+          child = Image.file(file, fit: BoxFit.cover);
+        }
+      }
+    }
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
       child: Container(
         width: size,
         height: size,
         color: AppTheme.moss.withValues(alpha: 0.12),
-        child: hasFile
-            ? Image.file(file, fit: BoxFit.cover)
-            : Icon(fallbackIcon, color: AppTheme.moss),
+        child: child,
       ),
     );
   }

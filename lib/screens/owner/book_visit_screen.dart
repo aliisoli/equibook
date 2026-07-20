@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
-import '../../widgets/common.dart';
+import '../../settings/app_settings.dart';
+import '../../utils/app_dates.dart';
 
 class BookVisitScreen extends StatefulWidget {
   const BookVisitScreen({super.key, required this.vetId});
@@ -30,6 +31,7 @@ class _BookVisitScreenState extends State<BookVisitScreen> {
 
   Future<void> _submit() async {
     final store = context.read<AppStore>();
+    final s = context.read<AppSettings>().strings;
     final owner = store.currentUser!;
     setState(() {
       _busy = true;
@@ -53,7 +55,7 @@ class _BookVisitScreenState extends State<BookVisitScreen> {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Booking request sent to the vet.')),
+      SnackBar(content: Text(s.bookingSent)),
     );
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
@@ -61,22 +63,23 @@ class _BookVisitScreenState extends State<BookVisitScreen> {
   @override
   Widget build(BuildContext context) {
     final store = context.watch<AppStore>();
+    final s = context.watch<AppSettings>().strings;
+    final dates = AppDates.watch(context);
     final horses = store.horsesFor(store.currentUser!.id);
     final services = store.servicesFor(widget.vetId);
     final slots = store.openSlotsFor(widget.vetId);
-    final selectedService = _serviceId == null
-        ? null
-        : store.serviceById(_serviceId!);
+    final selectedService =
+        _serviceId == null ? null : store.serviceById(_serviceId!);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Book a visit')),
+      appBar: AppBar(title: Text(s.bookAVisit)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text('Horse', style: Theme.of(context).textTheme.titleMedium),
+          Text(s.horse, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           if (horses.isEmpty)
-            const Text('Add a horse before booking.')
+            Text(s.addHorseBeforeBooking)
           else
             ...horses.map(
               (horse) => RadioListTile<String>(
@@ -88,7 +91,7 @@ class _BookVisitScreenState extends State<BookVisitScreen> {
               ),
             ),
           const SizedBox(height: 16),
-          Text('Service', style: Theme.of(context).textTheme.titleMedium),
+          Text(s.service, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           ...services.map(
             (service) => RadioListTile<String>(
@@ -99,28 +102,26 @@ class _BookVisitScreenState extends State<BookVisitScreen> {
                 _rateConfirmed = false;
               }),
               title: Text(service.title),
-              subtitle: Text(moneyFormat.format(service.rate)),
+              subtitle: Text(dates.formatMoney(service.rate)),
             ),
           ),
           const SizedBox(height: 16),
-          Text('Time slot', style: Theme.of(context).textTheme.titleMedium),
+          Text(s.timeSlot, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           ...slots.map(
             (slot) => RadioListTile<String>(
               value: slot.id,
               groupValue: _slotId,
               onChanged: (value) => setState(() => _slotId = value),
-              title: Text(dateTimeFormat.format(slot.start)),
-              subtitle: Text('Until ${timeFormat.format(slot.end)}'),
+              title: Text(dates.formatDateTime(slot.start)),
+              subtitle: Text(s.untilTime(dates.formatTime(slot.end))),
             ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _notes,
             maxLines: 3,
-            decoration: const InputDecoration(
-              labelText: 'Notes for the vet (optional)',
-            ),
+            decoration: InputDecoration(labelText: s.notesForVet),
           ),
           if (selectedService != null) ...[
             const SizedBox(height: 20),
@@ -131,25 +132,23 @@ class _BookVisitScreenState extends State<BookVisitScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Rate to confirm',
+                      s.rateToConfirm,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      moneyFormat.format(selectedService.rate),
+                      dates.formatMoney(selectedService.rate),
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Payment is handled offline in cash. Confirm that you accept this rate.',
-                    ),
+                    Text(s.cashConfirmHint),
                     CheckboxListTile(
                       contentPadding: EdgeInsets.zero,
                       value: _rateConfirmed,
                       onChanged: (value) =>
                           setState(() => _rateConfirmed = value ?? false),
                       title: Text(
-                        'I confirm the rate of ${moneyFormat.format(selectedService.rate)}',
+                        s.confirmRate(dates.formatMoney(selectedService.rate)),
                       ),
                       controlAffinity: ListTileControlAffinity.leading,
                     ),
@@ -171,7 +170,7 @@ class _BookVisitScreenState extends State<BookVisitScreen> {
                     !_rateConfirmed
                 ? null
                 : _submit,
-            child: Text(_busy ? 'Sending…' : 'Request booking'),
+            child: Text(_busy ? s.sending : s.requestBooking),
           ),
         ],
       ),

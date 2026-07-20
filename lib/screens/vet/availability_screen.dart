@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
+import '../../settings/app_settings.dart';
+import '../../utils/app_dates.dart';
 import '../../widgets/common.dart';
 
 class AvailabilityScreen extends StatelessWidget {
@@ -9,6 +11,7 @@ class AvailabilityScreen extends StatelessWidget {
 
   Future<void> _addSlot(BuildContext context) async {
     final store = context.read<AppStore>();
+    final s = context.read<AppSettings>().strings;
     final vetId = store.currentUser!.id;
     final now = DateTime.now();
     DateTime date = DateTime(now.year, now.month, now.day).add(
@@ -22,30 +25,33 @@ class AvailabilityScreen extends StatelessWidget {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setLocal) {
+            final localDates = AppDates.watch(context);
+            final localS = context.watch<AppSettings>().strings;
             return AlertDialog(
-              title: const Text('Add availability'),
+              title: Text(localS.addAvailability),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('Date'),
-                    subtitle: Text(dateFormat.format(date)),
+                    title: Text(localS.date),
+                    subtitle: Text(localDates.formatDate(date)),
                     trailing: const Icon(Icons.calendar_today),
                     onTap: () async {
-                      final picked = await showDatePicker(
+                      final picked = await localDates.pickDate(
                         context: context,
                         initialDate: date,
                         firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 120)),
+                        lastDate:
+                            DateTime.now().add(const Duration(days: 120)),
                       );
                       if (picked != null) setLocal(() => date = picked);
                     },
                   ),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('Start'),
-                    subtitle: Text(start.format(context)),
+                    title: Text(localS.start),
+                    subtitle: Text(localDates.formatTimeOfDay(context, start)),
                     onTap: () async {
                       final picked = await showTimePicker(
                         context: context,
@@ -56,8 +62,8 @@ class AvailabilityScreen extends StatelessWidget {
                   ),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('End'),
-                    subtitle: Text(end.format(context)),
+                    title: Text(localS.end),
+                    subtitle: Text(localDates.formatTimeOfDay(context, end)),
                     onTap: () async {
                       final picked = await showTimePicker(
                         context: context,
@@ -71,11 +77,11 @@ class AvailabilityScreen extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancel'),
+                  child: Text(localS.cancel),
                 ),
                 FilledButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Add'),
+                  child: Text(localS.add),
                 ),
               ],
             );
@@ -101,7 +107,7 @@ class AvailabilityScreen extends StatelessWidget {
     );
     if (!endDt.isAfter(startDt)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('End time must be after start time.')),
+        SnackBar(content: Text(s.endAfterStart)),
       );
       return;
     }
@@ -111,13 +117,15 @@ class AvailabilityScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = context.watch<AppStore>();
+    final s = context.watch<AppSettings>().strings;
+    final dates = AppDates.watch(context);
     final vetId = store.currentUser!.id;
     final slots = store.allSlotsFor(vetId);
-    final openIds = store.openSlotsFor(vetId).map((s) => s.id).toSet();
+    final openIds = store.openSlotsFor(vetId).map((slot) => slot.id).toSet();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Availability'),
+        title: Text(s.availability),
         actions: [
           IconButton(
             onPressed: () => _addSlot(context),
@@ -128,11 +136,11 @@ class AvailabilityScreen extends StatelessWidget {
       body: slots.isEmpty
           ? EmptyState(
               icon: Icons.calendar_month_outlined,
-              title: 'No availability',
-              message: 'Add time slots owners can book.',
+              title: s.noAvailability,
+              message: s.noAvailabilityMessage,
               action: FilledButton(
                 onPressed: () => _addSlot(context),
-                child: const Text('Add slot'),
+                child: Text(s.addSlot),
               ),
             )
           : ListView.separated(
@@ -144,9 +152,9 @@ class AvailabilityScreen extends StatelessWidget {
                 final open = openIds.contains(slot.id);
                 return Card(
                   child: ListTile(
-                    title: Text(dateTimeFormat.format(slot.start)),
+                    title: Text(dates.formatDateTime(slot.start)),
                     subtitle: Text(
-                      'Until ${timeFormat.format(slot.end)} · ${open ? 'Open' : 'Booked / past'}',
+                      '${s.untilTime(dates.formatTime(slot.end))} · ${s.slotStatus(open)}',
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete_outline),

@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
 import '../../models/models.dart';
+import '../../settings/app_settings.dart';
 import '../../widgets/common.dart';
 
 class HorseFormScreen extends StatefulWidget {
@@ -92,9 +93,10 @@ class _HorseFormScreenState extends State<HorseFormScreen> {
   }
 
   Future<void> _save() async {
+    final s = context.read<AppSettings>().strings;
     if (_name.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Horse name is required.')),
+        SnackBar(content: Text(s.horseNameRequired)),
       );
       return;
     }
@@ -114,19 +116,20 @@ class _HorseFormScreenState extends State<HorseFormScreen> {
   }
 
   Future<void> _delete() async {
+    final s = context.read<AppSettings>().strings;
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete horse?'),
-        content: Text('Remove ${widget.horse.name} from your stable?'),
+        title: Text(s.deleteHorse),
+        content: Text(s.removeHorse(widget.horse.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(s.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: Text(s.delete),
           ),
         ],
       ),
@@ -139,9 +142,10 @@ class _HorseFormScreenState extends State<HorseFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.watch<AppSettings>().strings;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isNew ? 'Add horse' : 'Edit horse'),
+        title: Text(widget.isNew ? s.addHorse : s.editHorse),
         actions: [
           if (!widget.isNew)
             IconButton(
@@ -165,7 +169,7 @@ class _HorseFormScreenState extends State<HorseFormScreen> {
                     fallbackIcon: Icons.add_a_photo_outlined,
                   ),
                   const SizedBox(height: 8),
-                  const Text('Tap to add photo'),
+                  Text(s.tapToAddPhoto),
                 ],
               ),
             ),
@@ -174,39 +178,37 @@ class _HorseFormScreenState extends State<HorseFormScreen> {
           TextField(
             controller: _name,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(labelText: 'Name'),
+            decoration: InputDecoration(labelText: s.name),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _breed,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(labelText: 'Breed (optional)'),
+            decoration: InputDecoration(labelText: s.breedOptional),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _notes,
             maxLines: 3,
-            decoration: const InputDecoration(labelText: 'Notes (optional)'),
+            decoration: InputDecoration(labelText: s.notesOptional),
           ),
           const SizedBox(height: 16),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.description_outlined),
-            title: Text(_docName ?? 'Ownership document'),
+            title: Text(_docName ?? s.ownershipDocument),
             subtitle: Text(
-              _docPath == null
-                  ? 'PDF or image of ownership papers'
-                  : 'Attached',
+              _docPath == null ? s.ownershipHint : s.attached,
             ),
             trailing: TextButton(
               onPressed: _pickDoc,
-              child: Text(_docPath == null ? 'Upload' : 'Replace'),
+              child: Text(_docPath == null ? s.upload : s.replace),
             ),
           ),
           const SizedBox(height: 24),
           FilledButton(
             onPressed: _busy ? null : _save,
-            child: Text(_busy ? 'Saving…' : 'Save horse'),
+            child: Text(_busy ? s.saving : s.saveHorse),
           ),
         ],
       ),

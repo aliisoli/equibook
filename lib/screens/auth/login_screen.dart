@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
+import '../../settings/app_settings.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -45,8 +46,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.watch<AppSettings>().strings;
     return Scaffold(
-      appBar: AppBar(title: const Text('Log in')),
+      appBar: AppBar(title: Text(s.logIn)),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
@@ -54,14 +56,14 @@ class _LoginScreenState extends State<LoginScreen> {
             controller: _email,
             keyboardType: TextInputType.emailAddress,
             autofillHints: const [AutofillHints.email],
-            decoration: const InputDecoration(labelText: 'Email'),
+            decoration: InputDecoration(labelText: s.email),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _password,
             obscureText: true,
             autofillHints: const [AutofillHints.password],
-            decoration: const InputDecoration(labelText: 'Password'),
+            decoration: InputDecoration(labelText: s.password),
           ),
           if (_error != null) ...[
             const SizedBox(height: 12),
@@ -70,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(height: 24),
           FilledButton(
             onPressed: _busy ? null : _submit,
-            child: Text(_busy ? 'Signing in…' : 'Log in'),
+            child: Text(_busy ? s.signingIn : s.logIn),
           ),
         ],
       ),

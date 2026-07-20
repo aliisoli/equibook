@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
 import '../../models/models.dart';
+import '../../settings/app_settings.dart';
+import '../../utils/app_dates.dart';
 import '../../widgets/common.dart';
 
 class ServicesScreen extends StatelessWidget {
@@ -11,15 +13,18 @@ class ServicesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = context.watch<AppStore>();
+    final s = context.watch<AppSettings>().strings;
+    final dates = AppDates.watch(context);
     final vetId = store.currentUser!.id;
     final services = store.servicesFor(vetId);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Services & rates'),
+        title: Text(s.servicesAndRates),
         actions: [
           IconButton(
-            onPressed: () => _openForm(context, store.newServiceDraft(vetId), true),
+            onPressed: () =>
+                _openForm(context, store.newServiceDraft(vetId), true),
             icon: const Icon(Icons.add),
           ),
         ],
@@ -27,12 +32,12 @@ class ServicesScreen extends StatelessWidget {
       body: services.isEmpty
           ? EmptyState(
               icon: Icons.medical_services_outlined,
-              title: 'No services listed',
-              message: 'Add services with cash rates owners will confirm when booking.',
+              title: s.noServicesListed,
+              message: s.noServicesMessage,
               action: FilledButton(
                 onPressed: () =>
                     _openForm(context, store.newServiceDraft(vetId), true),
-                child: const Text('Add service'),
+                child: Text(s.addService),
               ),
             )
           : ListView.separated(
@@ -45,10 +50,10 @@ class ServicesScreen extends StatelessWidget {
                   child: ListTile(
                     title: Text(service.title),
                     subtitle: Text(
-                      '${service.durationMinutes} min'
+                      '${s.minutesLabel(service.durationMinutes)}'
                       '${service.description.isEmpty ? '' : ' · ${service.description}'}',
                     ),
-                    trailing: Text(moneyFormat.format(service.rate)),
+                    trailing: Text(dates.formatMoney(service.rate)),
                     onTap: () => _openForm(context, service, false),
                   ),
                 );
@@ -93,7 +98,9 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
     _title = TextEditingController(text: widget.service.title);
     _description = TextEditingController(text: widget.service.description);
     _rate = TextEditingController(
-      text: widget.service.rate == 0 ? '' : widget.service.rate.toStringAsFixed(0),
+      text: widget.service.rate == 0
+          ? ''
+          : widget.service.rate.toStringAsFixed(0),
     );
     _duration = TextEditingController(
       text: widget.service.durationMinutes.toString(),
@@ -110,11 +117,15 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
   }
 
   Future<void> _save() async {
+    final s = context.read<AppSettings>().strings;
     final rate = double.tryParse(_rate.text.trim());
     final duration = int.tryParse(_duration.text.trim());
-    if (_title.text.trim().isEmpty || rate == null || rate <= 0 || duration == null) {
+    if (_title.text.trim().isEmpty ||
+        rate == null ||
+        rate <= 0 ||
+        duration == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a title, positive rate, and duration.')),
+        SnackBar(content: Text(s.serviceValidation)),
       );
       return;
     }
@@ -133,9 +144,10 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.watch<AppSettings>().strings;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isNew ? 'Add service' : 'Edit service'),
+        title: Text(widget.isNew ? s.addService : s.editService),
         actions: [
           if (!widget.isNew)
             IconButton(
@@ -153,20 +165,20 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
         children: [
           TextField(
             controller: _title,
-            decoration: const InputDecoration(labelText: 'Service title'),
+            decoration: InputDecoration(labelText: s.serviceTitle),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _description,
             maxLines: 3,
-            decoration: const InputDecoration(labelText: 'Description'),
+            decoration: InputDecoration(labelText: s.description),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _rate,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Cash rate (USD)',
+            decoration: InputDecoration(
+              labelText: s.cashRateUsd,
               prefixText: '\$ ',
             ),
           ),
@@ -174,12 +186,12 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
           TextField(
             controller: _duration,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Duration (minutes)'),
+            decoration: InputDecoration(labelText: s.durationMinutes),
           ),
           const SizedBox(height: 24),
           FilledButton(
             onPressed: _busy ? null : _save,
-            child: Text(_busy ? 'Saving…' : 'Save service'),
+            child: Text(_busy ? s.saving : s.saveService),
           ),
         ],
       ),

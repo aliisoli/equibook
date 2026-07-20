@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
 import '../../models/models.dart';
+import '../../settings/app_settings.dart';
+import '../../utils/app_dates.dart';
 import '../../widgets/common.dart';
 
 class VetBookingsScreen extends StatelessWidget {
@@ -11,17 +13,18 @@ class VetBookingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = context.watch<AppStore>();
+    final s = context.watch<AppSettings>().strings;
+    final dates = AppDates.watch(context);
     final vetId = store.currentUser!.id;
     final items = store.bookingsForVet(vetId);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Booking inbox')),
+      appBar: AppBar(title: Text(s.bookingInbox)),
       body: items.isEmpty
-          ? const EmptyState(
+          ? EmptyState(
               icon: Icons.inbox_outlined,
-              title: 'No bookings yet',
-              message:
-                  'When owners request visits, they appear here for accept or decline.',
+              title: s.noBookingsYet,
+              message: s.noBookingsVetMessage,
             )
           : ListView.separated(
               padding: const EdgeInsets.all(16),
@@ -42,7 +45,7 @@ class VetBookingsScreen extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                service?.title ?? 'Visit',
+                                service?.title ?? s.visit,
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ),
@@ -50,13 +53,12 @@ class VetBookingsScreen extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        Text('Owner: ${owner?.name ?? 'Unknown'}'),
-                        Text('Horse: ${horse?.name ?? 'Unknown'}'),
-                        Text(dateTimeFormat.format(booking.start)),
-                        Text(
-                          'Quoted rate: ${moneyFormat.format(booking.quotedRate)}',
-                        ),
-                        if (booking.notes.isNotEmpty) Text('Notes: ${booking.notes}'),
+                        Text(s.ownerLabel(owner?.name ?? s.unknown)),
+                        Text(s.horseLabel(horse?.name ?? s.unknown)),
+                        Text(dates.formatDateTime(booking.start)),
+                        Text(s.quotedRate(dates.formatMoney(booking.quotedRate))),
+                        if (booking.notes.isNotEmpty)
+                          Text(s.notesLabel(booking.notes)),
                         const SizedBox(height: 12),
                         Wrap(
                           spacing: 8,
@@ -67,14 +69,14 @@ class VetBookingsScreen extends StatelessWidget {
                                   booking.id,
                                   BookingStatus.confirmed,
                                 ),
-                                child: const Text('Accept'),
+                                child: Text(s.accept),
                               ),
                               OutlinedButton(
                                 onPressed: () => store.updateBookingStatus(
                                   booking.id,
                                   BookingStatus.declined,
                                 ),
-                                child: const Text('Decline'),
+                                child: Text(s.decline),
                               ),
                             ],
                             if (booking.status == BookingStatus.confirmed)
@@ -83,7 +85,7 @@ class VetBookingsScreen extends StatelessWidget {
                                   booking.id,
                                   BookingStatus.completed,
                                 ),
-                                child: const Text('Mark completed'),
+                                child: Text(s.markCompleted),
                               ),
                           ],
                         ),

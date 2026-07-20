@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
+import '../../settings/app_settings.dart';
+import '../../utils/app_dates.dart';
 import '../../widgets/common.dart';
 import 'book_visit_screen.dart';
 
@@ -13,9 +15,11 @@ class VetDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = context.watch<AppStore>();
+    final s = context.watch<AppSettings>().strings;
+    final dates = AppDates.watch(context);
     final vet = store.userById(vetId);
     if (vet == null) {
-      return const Scaffold(body: Center(child: Text('Vet not found')));
+      return Scaffold(body: Center(child: Text(s.vetNotFound)));
     }
     final profile = store.profileFor(vetId);
     final services = store.servicesFor(vetId);
@@ -34,14 +38,12 @@ class VetDetailScreen extends StatelessWidget {
                 children: [
                   Text(
                     profile.credentials.isEmpty
-                        ? 'Equine veterinarian'
+                        ? s.equineVeterinarian
                         : profile.credentials,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    profile.bio.isEmpty ? 'No bio yet.' : profile.bio,
-                  ),
+                  Text(profile.bio.isEmpty ? s.noBioYet : profile.bio),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -50,7 +52,7 @@ class VetDetailScreen extends StatelessWidget {
                       Expanded(
                         child: Text(
                           profile.serviceArea.isEmpty
-                              ? 'Service area not set'
+                              ? s.serviceAreaNotSet
                               : profile.serviceArea,
                         ),
                       ),
@@ -61,10 +63,10 @@ class VetDetailScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const SectionHeader('Services & rates'),
+          SectionHeader(s.servicesAndRates),
           const SizedBox(height: 8),
           if (services.isEmpty)
-            const Text('This vet has not listed services yet.')
+            Text(s.noServicesListed)
           else
             ...services.map(
               (service) => Card(
@@ -72,29 +74,29 @@ class VetDetailScreen extends StatelessWidget {
                   title: Text(service.title),
                   subtitle: Text(
                     service.description.isEmpty
-                        ? '${service.durationMinutes} min'
-                        : '${service.description}\n${service.durationMinutes} min',
+                        ? s.minutesLabel(service.durationMinutes)
+                        : '${service.description}\n${s.minutesLabel(service.durationMinutes)}',
                   ),
                   isThreeLine: service.description.isNotEmpty,
                   trailing: Text(
-                    moneyFormat.format(service.rate),
+                    dates.formatMoney(service.rate),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
               ),
             ),
           const SizedBox(height: 20),
-          SectionHeader('Open times (${slots.length})'),
+          SectionHeader(s.openTimes(slots.length)),
           const SizedBox(height: 8),
           if (slots.isEmpty)
-            const Text('No open slots right now.')
+            Text(s.noOpenSlots)
           else
             ...slots.take(5).map(
               (slot) => ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.schedule),
-                title: Text(dateTimeFormat.format(slot.start)),
-                subtitle: Text('Until ${timeFormat.format(slot.end)}'),
+                title: Text(dates.formatDateTime(slot.start)),
+                subtitle: Text(s.untilTime(dates.formatTime(slot.end))),
               ),
             ),
           const SizedBox(height: 24),
@@ -108,13 +110,10 @@ class VetDetailScreen extends StatelessWidget {
                       ),
                     );
                   },
-            child: const Text('Book a visit'),
+            child: Text(s.bookAVisit),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Payment is cash offline. You will confirm the rate before sending the request.',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
+          Text(s.cashOfflineHint, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
     );

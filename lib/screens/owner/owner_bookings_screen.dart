@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
 import '../../models/models.dart';
+import '../../settings/app_settings.dart';
+import '../../utils/app_dates.dart';
 import '../../widgets/common.dart';
 
 class OwnerBookingsScreen extends StatelessWidget {
@@ -13,15 +15,17 @@ class OwnerBookingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = context.watch<AppStore>();
+    final s = context.watch<AppSettings>().strings;
+    final dates = AppDates.watch(context);
     final items = store.bookingsForOwner(ownerId);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My bookings')),
+      appBar: AppBar(title: Text(s.myBookings)),
       body: items.isEmpty
-          ? const EmptyState(
+          ? EmptyState(
               icon: Icons.event_available_outlined,
-              title: 'No bookings yet',
-              message: 'Find a vet and request a visit for one of your horses.',
+              title: s.noBookingsYet,
+              message: s.noBookingsOwnerMessage,
             )
           : ListView.separated(
               padding: const EdgeInsets.all(16),
@@ -42,7 +46,7 @@ class OwnerBookingsScreen extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                service?.title ?? 'Visit',
+                                service?.title ?? s.visit,
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ),
@@ -50,23 +54,25 @@ class OwnerBookingsScreen extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        Text(vet?.name ?? 'Vet'),
-                        Text('Horse: ${horse?.name ?? 'Unknown'}'),
-                        Text(dateTimeFormat.format(booking.start)),
+                        Text(vet?.name ?? s.vet),
+                        Text(s.horseLabel(horse?.name ?? s.unknown)),
+                        Text(dates.formatDateTime(booking.start)),
                         Text(
-                          'Confirmed rate: ${moneyFormat.format(booking.quotedRate)} (cash offline)',
+                          s.confirmedRateLine(
+                            dates.formatMoney(booking.quotedRate),
+                          ),
                         ),
                         if (booking.status == BookingStatus.pending ||
                             booking.status == BookingStatus.confirmed) ...[
                           const SizedBox(height: 12),
                           Align(
-                            alignment: Alignment.centerRight,
+                            alignment: AlignmentDirectional.centerEnd,
                             child: TextButton(
                               onPressed: () => store.updateBookingStatus(
                                 booking.id,
                                 BookingStatus.cancelled,
                               ),
-                              child: const Text('Cancel'),
+                              child: Text(s.cancel),
                             ),
                           ),
                         ],

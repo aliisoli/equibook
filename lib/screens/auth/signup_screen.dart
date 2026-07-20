@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
 import '../../models/models.dart';
+import '../../settings/app_settings.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -54,24 +55,25 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.watch<AppSettings>().strings;
     return Scaffold(
-      appBar: AppBar(title: const Text('Create account')),
+      appBar: AppBar(title: Text(s.createAccount)),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          Text('I am a…', style: Theme.of(context).textTheme.titleMedium),
+          Text(s.iAmA, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           SegmentedButton<UserRole>(
-            segments: const [
+            segments: [
               ButtonSegment(
                 value: UserRole.owner,
-                label: Text('Horse owner'),
-                icon: Icon(Icons.pets),
+                label: Text(s.horseOwner),
+                icon: const Icon(Icons.pets),
               ),
               ButtonSegment(
                 value: UserRole.vet,
-                label: Text('Veterinarian'),
-                icon: Icon(Icons.medical_services_outlined),
+                label: Text(s.veterinarian),
+                icon: const Icon(Icons.medical_services_outlined),
               ),
             ],
             selected: {_role},
@@ -81,25 +83,25 @@ class _SignupScreenState extends State<SignupScreen> {
           TextField(
             controller: _name,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(labelText: 'Full name'),
+            decoration: InputDecoration(labelText: s.fullName),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _email,
             keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(labelText: 'Email'),
+            decoration: InputDecoration(labelText: s.email),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _phone,
             keyboardType: TextInputType.phone,
-            decoration: const InputDecoration(labelText: 'Phone (optional)'),
+            decoration: InputDecoration(labelText: s.phoneOptional),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _password,
             obscureText: true,
-            decoration: const InputDecoration(labelText: 'Password'),
+            decoration: InputDecoration(labelText: s.password),
           ),
           if (_error != null) ...[
             const SizedBox(height: 12),
@@ -108,7 +110,7 @@ class _SignupScreenState extends State<SignupScreen> {
           const SizedBox(height: 24),
           FilledButton(
             onPressed: _busy ? null : _submit,
-            child: Text(_busy ? 'Creating…' : 'Sign up'),
+            child: Text(_busy ? s.creating : s.signUp),
           ),
         ],
       ),

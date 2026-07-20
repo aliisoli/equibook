@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../settings/preferences.dart';
+
 class AppTheme {
   static const Color forest = Color(0xFF1F3D2B);
   static const Color moss = Color(0xFF3E6B4F);
@@ -8,7 +10,7 @@ class AppTheme {
   static const Color sand = Color(0xFFF3EDE3);
   static const Color ink = Color(0xFF1A1A1A);
 
-  static ThemeData get light {
+  static ThemeData lightFor(AppLanguage language) {
     final base = ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
@@ -21,21 +23,38 @@ class AppTheme {
       scaffoldBackgroundColor: sand,
     );
 
+    final textTheme = language == AppLanguage.farsi
+        ? GoogleFonts.vazirmatnTextTheme(base.textTheme)
+        : GoogleFonts.literataTextTheme(base.textTheme);
+
+    TextStyle titleStyle() => language == AppLanguage.farsi
+        ? GoogleFonts.vazirmatn(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: forest,
+          )
+        : GoogleFonts.literata(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: forest,
+          );
+
+    TextStyle navStyle() => language == AppLanguage.farsi
+        ? GoogleFonts.vazirmatn(fontSize: 12, fontWeight: FontWeight.w600)
+        : GoogleFonts.literata(fontSize: 12, fontWeight: FontWeight.w600);
+
+    TextStyle chipStyle() => language == AppLanguage.farsi
+        ? GoogleFonts.vazirmatn(color: forest)
+        : GoogleFonts.literata(color: forest);
+
     return base.copyWith(
-      textTheme: GoogleFonts.literataTextTheme(base.textTheme).apply(
-        bodyColor: ink,
-        displayColor: forest,
-      ),
+      textTheme: textTheme.apply(bodyColor: ink, displayColor: forest),
       appBarTheme: AppBarTheme(
         backgroundColor: sand,
         foregroundColor: forest,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: GoogleFonts.literata(
-          fontSize: 22,
-          fontWeight: FontWeight.w700,
-          color: forest,
-        ),
+        titleTextStyle: titleStyle(),
       ),
       cardTheme: CardThemeData(
         color: Colors.white.withValues(alpha: 0.92),
@@ -84,14 +103,12 @@ class AppTheme {
       chipTheme: base.chipTheme.copyWith(
         backgroundColor: Colors.white,
         selectedColor: moss.withValues(alpha: 0.2),
-        labelStyle: GoogleFonts.literata(color: forest),
+        labelStyle: chipStyle(),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: Colors.white,
         indicatorColor: moss.withValues(alpha: 0.18),
-        labelTextStyle: WidgetStatePropertyAll(
-          GoogleFonts.literata(fontSize: 12, fontWeight: FontWeight.w600),
-        ),
+        labelTextStyle: WidgetStatePropertyAll(navStyle()),
       ),
     );
   }

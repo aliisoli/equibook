@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
+import '../../settings/app_settings.dart';
 import '../../widgets/common.dart';
 import 'horse_form_screen.dart';
 
@@ -13,14 +14,15 @@ class HorsesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = context.watch<AppStore>();
+    final s = context.watch<AppSettings>().strings;
     final horses = store.horsesFor(ownerId);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My horses'),
+        title: Text(s.myHorses),
         actions: [
           IconButton(
-            tooltip: 'Add horse',
+            tooltip: s.addHorse,
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -38,8 +40,8 @@ class HorsesScreen extends StatelessWidget {
       body: horses.isEmpty
           ? EmptyState(
               icon: Icons.pets_outlined,
-              title: 'No horses yet',
-              message: 'Add a horse with a photo and ownership documents.',
+              title: s.noHorsesYet,
+              message: s.noHorsesMessage,
               action: FilledButton(
                 onPressed: () {
                   Navigator.of(context).push(
@@ -51,7 +53,7 @@ class HorsesScreen extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text('Add horse'),
+                child: Text(s.addHorse),
               ),
             )
           : ListView.separated(
@@ -72,7 +74,7 @@ class HorsesScreen extends StatelessWidget {
                       [
                         if (horse.breed.isNotEmpty) horse.breed,
                         if (horse.ownershipDocName != null)
-                          'Doc: ${horse.ownershipDocName}',
+                          '${s.ownershipDocument}: ${horse.ownershipDocName}',
                       ].join(' · '),
                     ),
                     trailing: const Icon(Icons.chevron_right),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
+import '../../settings/app_settings.dart';
 import '../../widgets/common.dart';
 import 'vet_detail_screen.dart';
 
@@ -18,6 +19,7 @@ class _FindVetsScreenState extends State<FindVetsScreen> {
   @override
   Widget build(BuildContext context) {
     final store = context.watch<AppStore>();
+    final s = context.watch<AppSettings>().strings;
     final vets = store.vets.where((vet) {
       final profile = store.profileFor(vet.id);
       final haystack =
@@ -26,25 +28,25 @@ class _FindVetsScreenState extends State<FindVetsScreen> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Find vets')),
+      appBar: AppBar(title: Text(s.findVets)),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: TextField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search),
-                hintText: 'Search by name or area',
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search),
+                hintText: s.searchVetsHint,
               ),
               onChanged: (value) => setState(() => _query = value),
             ),
           ),
           Expanded(
             child: vets.isEmpty
-                ? const EmptyState(
+                ? EmptyState(
                     icon: Icons.search_off,
-                    title: 'No vets found',
-                    message: 'Try another search, or ask a vet to sign up.',
+                    title: s.noVetsFound,
+                    message: s.noVetsMessage,
                   )
                 : ListView.separated(
                     padding: const EdgeInsets.all(16),
@@ -65,13 +67,11 @@ class _FindVetsScreenState extends State<FindVetsScreen> {
                               const SizedBox(height: 6),
                               Text(
                                 profile.serviceArea.isEmpty
-                                    ? 'Service area not set'
+                                    ? s.serviceAreaNotSet
                                     : profile.serviceArea,
                               ),
                               const SizedBox(height: 4),
-                              Text(
-                                '$serviceCount services · $openSlots open slots',
-                              ),
+                              Text(s.servicesAndSlots(serviceCount, openSlots)),
                             ],
                           ),
                           trailing: const Icon(Icons.chevron_right),

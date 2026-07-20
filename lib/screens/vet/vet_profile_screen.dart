@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
+import '../../settings/app_settings.dart';
+import '../../widgets/preferences_section.dart';
 
 class VetProfileScreen extends StatefulWidget {
   const VetProfileScreen({super.key});
@@ -40,6 +42,7 @@ class _VetProfileScreenState extends State<VetProfileScreen> {
 
   Future<void> _save() async {
     final store = context.read<AppStore>();
+    final s = context.read<AppSettings>().strings;
     await store.updateVetProfile(
       store.profileFor(store.currentUser!.id).copyWith(
         bio: _bio.text.trim(),
@@ -49,17 +52,18 @@ class _VetProfileScreenState extends State<VetProfileScreen> {
     );
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile saved')),
+      SnackBar(content: Text(s.profileSaved)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final store = context.watch<AppStore>();
+    final s = context.watch<AppSettings>().strings;
     final user = store.currentUser!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Vet profile')),
+      appBar: AppBar(title: Text(s.vetProfile)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -68,32 +72,34 @@ class _VetProfileScreenState extends State<VetProfileScreen> {
           const SizedBox(height: 20),
           TextField(
             controller: _credentials,
-            decoration: const InputDecoration(
-              labelText: 'Credentials',
-              hintText: 'DVM · specialty',
+            decoration: InputDecoration(
+              labelText: s.credentials,
+              hintText: s.credentialsHint,
             ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _area,
-            decoration: const InputDecoration(
-              labelText: 'Service area',
-              hintText: 'City / radius',
+            decoration: InputDecoration(
+              labelText: s.serviceArea,
+              hintText: s.serviceAreaHint,
             ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _bio,
             maxLines: 4,
-            decoration: const InputDecoration(labelText: 'Bio'),
+            decoration: InputDecoration(labelText: s.bio),
           ),
           const SizedBox(height: 20),
-          FilledButton(onPressed: _save, child: const Text('Save profile')),
+          FilledButton(onPressed: _save, child: Text(s.saveProfile)),
+          const SizedBox(height: 24),
+          const PreferencesSection(),
           const SizedBox(height: 12),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.logout),
-            title: const Text('Log out'),
+            title: Text(s.logOut),
             onTap: () => store.logout(),
           ),
         ],

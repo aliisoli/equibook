@@ -3,14 +3,19 @@ import 'package:provider/provider.dart';
 
 import 'app.dart';
 import 'data/app_store.dart';
+import 'settings/app_settings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final settings = AppSettings();
   final store = AppStore();
-  await store.init();
+  await Future.wait([settings.init(), store.init()]);
   runApp(
-    ChangeNotifierProvider.value(
-      value: store,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: settings),
+        ChangeNotifierProvider.value(value: store),
+      ],
       child: const EquiBookApp(),
     ),
   );

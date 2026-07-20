@@ -2,15 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
+import '../l10n/app_strings.dart';
 import '../models/models.dart';
+import '../settings/app_settings.dart';
 import '../theme/app_theme.dart';
-
-final moneyFormat = NumberFormat.currency(symbol: '\$');
-final dateTimeFormat = DateFormat('EEE, MMM d · h:mm a');
-final dateFormat = DateFormat('EEE, MMM d');
-final timeFormat = DateFormat('h:mm a');
 
 class EmptyState extends StatelessWidget {
   const EmptyState({
@@ -66,8 +63,17 @@ class StatusChip extends StatelessWidget {
     BookingStatus.cancelled => Colors.grey.shade700,
   };
 
+  String _label(AppStrings s) => switch (status) {
+    BookingStatus.pending => s.statusPending,
+    BookingStatus.confirmed => s.statusConfirmed,
+    BookingStatus.declined => s.statusDeclined,
+    BookingStatus.completed => s.statusCompleted,
+    BookingStatus.cancelled => s.statusCancelled,
+  };
+
   @override
   Widget build(BuildContext context) {
+    final s = context.watch<AppSettings>().strings;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -75,7 +81,7 @@ class StatusChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        status.label,
+        _label(s),
         style: TextStyle(
           color: _color,
           fontWeight: FontWeight.w700,
@@ -105,9 +111,13 @@ class LocalImage extends StatelessWidget {
     Widget child = Icon(fallbackIcon, color: AppTheme.moss);
     if (path != null && path!.isNotEmpty) {
       if (kIsWeb || path!.startsWith('http') || path!.startsWith('blob:')) {
-        child = Image.network(path!, fit: BoxFit.cover, errorBuilder: (_, _, _) {
-          return Icon(fallbackIcon, color: AppTheme.moss);
-        });
+        child = Image.network(
+          path!,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) {
+            return Icon(fallbackIcon, color: AppTheme.moss);
+          },
+        );
       } else {
         final file = File(path!);
         if (file.existsSync()) {

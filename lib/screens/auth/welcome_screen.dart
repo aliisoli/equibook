@@ -79,7 +79,9 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                '${s.roleOwner}: ${AppStore.demoOwnerEmail}\n${s.roleVet}: ${AppStore.demoVetEmail}',
+                '${s.roleOwner}: ${AppStore.demoOwnerEmail}\n'
+                '${s.roleVet}: ${AppStore.demoVetEmail}\n'
+                '${s.farrier}: ${AppStore.demoFarrierEmail}',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppTheme.ink.withValues(alpha: 0.7),
                 ),

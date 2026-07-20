@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
 import '../../settings/app_settings.dart';
+import '../../theme/mock_ui.dart';
 import '../../widgets/common.dart';
 import 'horse_form_screen.dart';
 
@@ -18,8 +19,10 @@ class HorsesScreen extends StatelessWidget {
     final horses = store.horsesFor(ownerId);
 
     return Scaffold(
+      backgroundColor: MockColors.pageBg,
       appBar: AppBar(
         title: Text(s.myHorses),
+        backgroundColor: MockColors.pageBg,
         actions: [
           IconButton(
             tooltip: s.addHorse,

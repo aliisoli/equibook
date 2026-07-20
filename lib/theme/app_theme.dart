@@ -20,7 +20,7 @@ class AppTheme {
         surface: sand,
         brightness: Brightness.light,
       ),
-      scaffoldBackgroundColor: sand,
+      scaffoldBackgroundColor: const Color(0xFFF5F6F8),
     );
 
     final textTheme = language == AppLanguage.farsi

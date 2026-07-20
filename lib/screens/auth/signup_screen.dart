@@ -18,6 +18,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _password = TextEditingController();
   final _phone = TextEditingController();
   UserRole _role = UserRole.owner;
+  ServiceCategory _providerCategory = ServiceCategory.veterinary;
   String? _error;
   bool _busy = false;
 
@@ -41,6 +42,7 @@ class _SignupScreenState extends State<SignupScreen> {
       name: _name.text,
       role: _role,
       phone: _phone.text,
+      providerCategory: _providerCategory,
     );
     if (!mounted) return;
     if (error != null) {
@@ -79,6 +81,26 @@ class _SignupScreenState extends State<SignupScreen> {
             selected: {_role},
             onSelectionChanged: (value) => setState(() => _role = value.first),
           ),
+          if (_role == UserRole.vet) ...[
+            const SizedBox(height: 16),
+            Text(s.providerType, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            SegmentedButton<ServiceCategory>(
+              segments: [
+                ButtonSegment(
+                  value: ServiceCategory.veterinary,
+                  label: Text(s.veterinarian),
+                ),
+                ButtonSegment(
+                  value: ServiceCategory.farriery,
+                  label: Text(s.farrier),
+                ),
+              ],
+              selected: {_providerCategory},
+              onSelectionChanged: (value) =>
+                  setState(() => _providerCategory = value.first),
+            ),
+          ],
           const SizedBox(height: 20),
           TextField(
             controller: _name,

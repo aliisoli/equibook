@@ -371,6 +371,7 @@ class HorseReminder {
   final bool done;
 
   HorseReminder copyWith({
+    String? horseId,
     String? title,
     DateTime? dueDate,
     ReminderKind? kind,
@@ -379,7 +380,7 @@ class HorseReminder {
     return HorseReminder(
       id: id,
       ownerId: ownerId,
-      horseId: horseId,
+      horseId: horseId ?? this.horseId,
       title: title ?? this.title,
       dueDate: dueDate ?? this.dueDate,
       kind: kind ?? this.kind,

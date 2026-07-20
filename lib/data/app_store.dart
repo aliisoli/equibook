@@ -468,6 +468,7 @@ class AppStore extends ChangeNotifier {
 
   Future<void> deleteHorse(String horseId) async {
     horses.removeWhere((h) => h.id == horseId);
+    reminders.removeWhere((r) => r.horseId == horseId);
     await _save();
     notifyListeners();
   }

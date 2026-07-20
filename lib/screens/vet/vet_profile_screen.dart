@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
+import '../../models/models.dart';
 import '../../settings/app_settings.dart';
 import '../../widgets/preferences_section.dart';
 
@@ -16,6 +17,7 @@ class _VetProfileScreenState extends State<VetProfileScreen> {
   late final TextEditingController _bio;
   late final TextEditingController _area;
   late final TextEditingController _credentials;
+  late ServiceCategory _category;
   bool _ready = false;
 
   @override
@@ -27,6 +29,7 @@ class _VetProfileScreenState extends State<VetProfileScreen> {
     _bio = TextEditingController(text: profile.bio);
     _area = TextEditingController(text: profile.serviceArea);
     _credentials = TextEditingController(text: profile.credentials);
+    _category = profile.category;
     _ready = true;
   }
 
@@ -48,6 +51,7 @@ class _VetProfileScreenState extends State<VetProfileScreen> {
         bio: _bio.text.trim(),
         serviceArea: _area.text.trim(),
         credentials: _credentials.text.trim(),
+        category: _category,
       ),
     );
     if (!mounted) return;
@@ -70,6 +74,24 @@ class _VetProfileScreenState extends State<VetProfileScreen> {
           Text(user.name, style: Theme.of(context).textTheme.titleLarge),
           Text(user.email),
           const SizedBox(height: 20),
+          Text(s.providerType, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          SegmentedButton<ServiceCategory>(
+            segments: [
+              ButtonSegment(
+                value: ServiceCategory.veterinary,
+                label: Text(s.veterinarian),
+              ),
+              ButtonSegment(
+                value: ServiceCategory.farriery,
+                label: Text(s.farrier),
+              ),
+            ],
+            selected: {_category},
+            onSelectionChanged: (value) =>
+                setState(() => _category = value.first),
+          ),
+          const SizedBox(height: 16),
           TextField(
             controller: _credentials,
             decoration: InputDecoration(

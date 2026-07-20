@@ -10,7 +10,7 @@ class AppStore extends ChangeNotifier {
   AppStore();
 
   static const _uuid = Uuid();
-  static const _storageKey = 'equibook_local_v1';
+  static const _storageKey = 'equibook_local_v2';
   static const _demoVetEmail = 'vet@equibook.demo';
   static const _demoFarrierEmail = 'farrier@equibook.demo';
   static const _demoOwnerEmail = 'owner@equibook.demo';

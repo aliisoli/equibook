@@ -7,9 +7,20 @@ import '../l10n/app_strings.dart';
 class AppSettings extends ChangeNotifier {
   static const _languageKey = 'equibook_language';
   static const _calendarKey = 'equibook_calendar';
+  static const _cityKey = 'equibook_city';
+
+  static const defaultCities = [
+    'Qazvin',
+    'Tehran',
+    'Karaj',
+    'Isfahan',
+    'Shiraz',
+    'Tabriz',
+  ];
 
   AppLanguage language = AppLanguage.english;
   AppCalendar calendar = AppCalendar.gregorian;
+  String city = 'Qazvin';
   bool ready = false;
 
   Locale get locale => Locale(language.code);
@@ -23,6 +34,7 @@ class AppSettings extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     language = AppLanguage.fromCode(prefs.getString(_languageKey));
     calendar = AppCalendar.fromName(prefs.getString(_calendarKey));
+    city = prefs.getString(_cityKey) ?? 'Qazvin';
     ready = true;
     notifyListeners();
   }
@@ -40,6 +52,14 @@ class AppSettings extends ChangeNotifier {
     calendar = value;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_calendarKey, value.name);
+    notifyListeners();
+  }
+
+  Future<void> setCity(String value) async {
+    if (city == value) return;
+    city = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_cityKey, value);
     notifyListeners();
   }
 }

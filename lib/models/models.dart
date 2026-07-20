@@ -128,23 +128,27 @@ class VetProfile {
     this.bio = '',
     this.serviceArea = '',
     this.credentials = '',
+    this.category = ServiceCategory.veterinary,
   });
 
   final String userId;
   final String bio;
   final String serviceArea;
   final String credentials;
+  final ServiceCategory category;
 
   VetProfile copyWith({
     String? bio,
     String? serviceArea,
     String? credentials,
+    ServiceCategory? category,
   }) {
     return VetProfile(
       userId: userId,
       bio: bio ?? this.bio,
       serviceArea: serviceArea ?? this.serviceArea,
       credentials: credentials ?? this.credentials,
+      category: category ?? this.category,
     );
   }
 
@@ -153,6 +157,7 @@ class VetProfile {
     'bio': bio,
     'serviceArea': serviceArea,
     'credentials': credentials,
+    'category': category.name,
   };
 
   factory VetProfile.fromJson(Map<String, dynamic> json) => VetProfile(
@@ -160,6 +165,7 @@ class VetProfile {
     bio: (json['bio'] as String?) ?? '',
     serviceArea: (json['serviceArea'] as String?) ?? '',
     credentials: (json['credentials'] as String?) ?? '',
+    category: _categoryFrom(json['category'] as String?),
   );
 }
 
@@ -171,6 +177,7 @@ class ServiceOffering {
     required this.rate,
     this.description = '',
     this.durationMinutes = 60,
+    this.category = ServiceCategory.veterinary,
   });
 
   final String id;
@@ -179,12 +186,14 @@ class ServiceOffering {
   final String description;
   final double rate;
   final int durationMinutes;
+  final ServiceCategory category;
 
   ServiceOffering copyWith({
     String? title,
     String? description,
     double? rate,
     int? durationMinutes,
+    ServiceCategory? category,
   }) {
     return ServiceOffering(
       id: id,
@@ -193,6 +202,7 @@ class ServiceOffering {
       description: description ?? this.description,
       rate: rate ?? this.rate,
       durationMinutes: durationMinutes ?? this.durationMinutes,
+      category: category ?? this.category,
     );
   }
 
@@ -203,6 +213,7 @@ class ServiceOffering {
     'description': description,
     'rate': rate,
     'durationMinutes': durationMinutes,
+    'category': category.name,
   };
 
   factory ServiceOffering.fromJson(Map<String, dynamic> json) =>
@@ -213,7 +224,16 @@ class ServiceOffering {
         description: (json['description'] as String?) ?? '',
         rate: (json['rate'] as num).toDouble(),
         durationMinutes: (json['durationMinutes'] as num?)?.toInt() ?? 60,
+        category: _categoryFrom(json['category'] as String?),
       );
+}
+
+ServiceCategory _categoryFrom(String? name) {
+  if (name == null) return ServiceCategory.veterinary;
+  return ServiceCategory.values.firstWhere(
+    (c) => c.name == name,
+    orElse: () => ServiceCategory.veterinary,
+  );
 }
 
 class AvailabilitySlot {
@@ -328,5 +348,65 @@ class Booking {
     createdAt: DateTime.parse(json['createdAt'] as String),
     notes: (json['notes'] as String?) ?? '',
     rateConfirmedByOwner: (json['rateConfirmedByOwner'] as bool?) ?? false,
+  );
+}
+
+class HorseReminder {
+  HorseReminder({
+    required this.id,
+    required this.ownerId,
+    required this.horseId,
+    required this.title,
+    required this.dueDate,
+    this.kind = ReminderKind.other,
+    this.done = false,
+  });
+
+  final String id;
+  final String ownerId;
+  final String horseId;
+  final String title;
+  final DateTime dueDate;
+  final ReminderKind kind;
+  final bool done;
+
+  HorseReminder copyWith({
+    String? title,
+    DateTime? dueDate,
+    ReminderKind? kind,
+    bool? done,
+  }) {
+    return HorseReminder(
+      id: id,
+      ownerId: ownerId,
+      horseId: horseId,
+      title: title ?? this.title,
+      dueDate: dueDate ?? this.dueDate,
+      kind: kind ?? this.kind,
+      done: done ?? this.done,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'ownerId': ownerId,
+    'horseId': horseId,
+    'title': title,
+    'dueDate': dueDate.toIso8601String(),
+    'kind': kind.name,
+    'done': done,
+  };
+
+  factory HorseReminder.fromJson(Map<String, dynamic> json) => HorseReminder(
+    id: json['id'] as String,
+    ownerId: json['ownerId'] as String,
+    horseId: json['horseId'] as String,
+    title: json['title'] as String,
+    dueDate: DateTime.parse(json['dueDate'] as String),
+    kind: ReminderKind.values.firstWhere(
+      (k) => k.name == json['kind'],
+      orElse: () => ReminderKind.other,
+    ),
+    done: (json['done'] as bool?) ?? false,
   );
 }

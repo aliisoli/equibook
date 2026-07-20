@@ -1,3 +1,4 @@
+import '../models/enums.dart';
 import '../settings/preferences.dart';
 
 /// Bilingual UI copy. Dates are formatted separately via [AppDates].
@@ -198,4 +199,99 @@ class AppStrings {
   String get statusCancelled => _fa ? 'لغو شده' : 'Cancelled';
 
   String get vetNotFound => _fa ? 'دامپزشک یافت نشد' : 'Vet not found';
+  String get providerNotFound =>
+      _fa ? 'ارائه‌دهنده یافت نشد' : 'Provider not found';
+
+  String get home => _fa ? 'خانه' : 'Home';
+  String get bookServices => _fa ? 'رزرو خدمات' : 'Book services';
+  String get messages => _fa ? 'پیام‌ها' : 'Messages';
+  String get taglineShort =>
+      _fa ? 'همه چیز برای اسب شما، در یک جا' : 'Everything for your horse, in one place';
+  String helloName(String name) => _fa ? 'سلام $name' : 'Hello $name';
+  String get welcomeHome => _fa
+      ? 'خوش آمدید، امیدواریم روز خوبی با اسب‌های خود داشته باشید.'
+      : 'Welcome — hope you have a great day with your horses.';
+  String get upcomingAppointments =>
+      _fa ? 'نوبت‌های پیش رو' : 'Upcoming appointments';
+  String get reminders => _fa ? 'یادآوری‌ها' : 'Reminders';
+  String get viewAll => _fa ? 'مشاهده همه' : 'View all';
+  String get noUpcoming =>
+      _fa ? 'نوبت نزدیکی ندارید.' : 'No upcoming appointments.';
+  String get noReminders =>
+      _fa ? 'یادآوری‌ای ثبت نشده است.' : 'No reminders yet.';
+  String get addReminder => _fa ? 'افزودن یادآوری' : 'Add reminder';
+  String get editReminder => _fa ? 'ویرایش یادآوری' : 'Edit reminder';
+  String get saveReminder => _fa ? 'ذخیره یادآوری' : 'Save reminder';
+  String get reminderTitle => _fa ? 'عنوان' : 'Title';
+  String get dueDate => _fa ? 'موعد' : 'Due date';
+  String get reminderKind => _fa ? 'نوع' : 'Type';
+  String get markDone => _fa ? 'انجام شد' : 'Mark done';
+  String daysLeft(int days) {
+    if (days < 0) return _fa ? 'گذشته' : 'Overdue';
+    if (days == 0) return _fa ? 'امروز' : 'Today';
+    if (days == 1) return _fa ? '۱ روز دیگر' : 'In 1 day';
+    return _fa ? '$days روز دیگر' : 'In $days days';
+  }
+
+  String get categoryVet => _fa ? 'ویزیت دامپزشک' : 'Vet visit';
+  String get categoryFarrier => _fa ? 'نعلبندی' : 'Farriery';
+  String get categoryRiding => _fa ? 'کلاس سوارکاری' : 'Riding class';
+  String get categoryClub => _fa ? 'مدیریت باشگاه' : 'Club management';
+  String get categoryShop => _fa ? 'فروشگاه' : 'Shop';
+  String get bookAppointment => _fa ? 'رزرو نوبت' : 'Book appointment';
+  String get bookClass => _fa ? 'رزرو کلاس' : 'Book class';
+  String get clubServices => _fa ? 'خدمات باشگاه' : 'Club services';
+  String get horseEquipment => _fa ? 'تجهیزات اسب' : 'Horse equipment';
+  String get comingSoon => _fa ? 'به‌زودی' : 'Coming soon';
+  String get comingSoonMessage => _fa
+      ? 'این بخش به‌زودی فعال می‌شود.'
+      : 'This section will be available soon.';
+  String get findProviders => _fa ? 'یافتن متخصص' : 'Find providers';
+  String get messagesComingSoon => _fa
+      ? 'پیام‌رسانی هنوز فعال نیست.'
+      : 'Messaging is not available yet.';
+  String get chooseCity => _fa ? 'انتخاب شهر' : 'Choose city';
+  String get notifications => _fa ? 'اعلان‌ها' : 'Notifications';
+  String get noNotifications =>
+      _fa ? 'اعلان جدیدی ندارید.' : 'No new notifications.';
+  String get providerType => _fa ? 'نوع تخصص' : 'Specialty';
+  String get farrier => _fa ? 'نعلبند' : 'Farrier';
+  String get statusPendingConfirm =>
+      _fa ? 'در انتظار تأیید' : 'Pending confirmation';
+
+  String kindLabel(ReminderKind kind) => switch (kind) {
+    ReminderKind.vaccine => _fa ? 'واکسن' : 'Vaccine',
+    ReminderKind.deworming => _fa ? 'ضد ضد انگل' : 'Deworming',
+    ReminderKind.pregnancyTest => _fa ? 'آزمایش بارداری' : 'Pregnancy test',
+    ReminderKind.other => _fa ? 'سایر' : 'Other',
+  };
+
+  String categoryTitle(ServiceCategory category) => switch (category) {
+    ServiceCategory.veterinary => categoryVet,
+    ServiceCategory.farriery => categoryFarrier,
+    ServiceCategory.ridingClass => categoryRiding,
+    ServiceCategory.clubManagement => categoryClub,
+    ServiceCategory.shop => categoryShop,
+  };
+
+  String categorySubtitle(ServiceCategory category) => switch (category) {
+    ServiceCategory.veterinary => bookAppointment,
+    ServiceCategory.farriery => bookAppointment,
+    ServiceCategory.ridingClass => bookClass,
+    ServiceCategory.clubManagement => clubServices,
+    ServiceCategory.shop => horseEquipment,
+  };
+
+  String cityLabel(String city) {
+    if (!_fa) return city;
+    return switch (city) {
+      'Qazvin' => 'قزوین',
+      'Tehran' => 'تهران',
+      'Karaj' => 'کرج',
+      'Isfahan' => 'اصفهان',
+      'Shiraz' => 'شیراز',
+      'Tabriz' => 'تبریز',
+      _ => city,
+    };
+  }
 }

@@ -294,4 +294,18 @@ class AppStrings {
       _ => city,
     };
   }
+
+  /// Demo/content titles stored in English; show Farsi when locale is fa.
+  String localizedContentTitle(String title) {
+    if (!_fa) return title;
+    return switch (title) {
+      'Farm visit checkup' => 'ویزیت مزرعه‌ای',
+      'Dental float' => 'رسوب‌زدایی دندان',
+      'Full shoeing' => 'نعل‌بندی کامل',
+      'Pregnancy test' => 'آزمایش بارداری',
+      'Deworming tablet' => 'قرص ضد انگل',
+      'Influenza vaccine' => 'واکسن آنفلوآنزا',
+      _ => title,
+    };
+  }
 }

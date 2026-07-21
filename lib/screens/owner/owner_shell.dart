@@ -34,60 +34,76 @@ class _OwnerShellState extends State<OwnerShell> {
 
     return Scaffold(
       body: pages[_index],
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 12,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
+      bottomNavigationBar: Material(
+        color: Colors.white,
+        elevation: 8,
+        shadowColor: Colors.black26,
         child: SafeArea(
+          top: false,
           child: SizedBox(
-            height: 68,
-            child: Row(
+            height: 64,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.bottomCenter,
               children: [
-                _NavItem(
-                  icon: Icons.home_outlined,
-                  activeIcon: Icons.home,
-                  label: s.home,
-                  selected: _index == 0,
-                  onTap: () => setState(() => _index = 0),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _NavItem(
+                      icon: Icons.home_outlined,
+                      activeIcon: Icons.home,
+                      label: s.home,
+                      selected: _index == 0,
+                      onTap: () => setState(() => _index = 0),
+                    ),
+                    _NavItem(
+                      icon: Icons.pets_outlined,
+                      activeIcon: Icons.pets,
+                      label: s.myHorses,
+                      selected: _index == 1,
+                      onTap: () => setState(() => _index = 1),
+                    ),
+                    const SizedBox(width: 64),
+                    _NavItem(
+                      icon: Icons.chat_bubble_outline,
+                      activeIcon: Icons.chat_bubble,
+                      label: s.messages,
+                      selected: _index == 3,
+                      onTap: () => setState(() => _index = 3),
+                    ),
+                    _NavItem(
+                      icon: Icons.person_outline,
+                      activeIcon: Icons.person,
+                      label: s.profile,
+                      selected: _index == 4,
+                      onTap: () => setState(() => _index = 4),
+                    ),
+                  ],
                 ),
-                _NavItem(
-                  icon: Icons.pets_outlined,
-                  activeIcon: Icons.pets,
-                  label: s.myHorses,
-                  selected: _index == 1,
-                  onTap: () => setState(() => _index = 1),
-                ),
-                Expanded(
+                Positioned(
+                  top: -18,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Transform.translate(
-                        offset: const Offset(0, -10),
-                        child: Material(
-                          color: AppTheme.forest,
-                          shape: const CircleBorder(),
-                          elevation: 3,
-                          child: InkWell(
-                            customBorder: const CircleBorder(),
-                            onTap: () => setState(() => _index = 2),
-                            child: const SizedBox(
-                              width: 56,
-                              height: 56,
-                              child: Icon(
-                                Icons.calendar_month,
-                                color: Colors.white,
-                              ),
+                      Material(
+                        color: AppTheme.forest,
+                        shape: const CircleBorder(),
+                        elevation: 4,
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: () => setState(() => _index = 2),
+                          child: const SizedBox(
+                            width: 52,
+                            height: 52,
+                            child: Icon(
+                              Icons.calendar_month,
+                              color: Colors.white,
+                              size: 26,
                             ),
                           ),
                         ),
                       ),
+                      const SizedBox(height: 2),
                       Text(
                         s.bookServices,
                         style: TextStyle(
@@ -100,20 +116,6 @@ class _OwnerShellState extends State<OwnerShell> {
                       ),
                     ],
                   ),
-                ),
-                _NavItem(
-                  icon: Icons.chat_bubble_outline,
-                  activeIcon: Icons.chat_bubble,
-                  label: s.messages,
-                  selected: _index == 3,
-                  onTap: () => setState(() => _index = 3),
-                ),
-                _NavItem(
-                  icon: Icons.person_outline,
-                  activeIcon: Icons.person,
-                  label: s.profile,
-                  selected: _index == 4,
-                  onTap: () => setState(() => _index = 4),
                 ),
               ],
             ),
@@ -146,22 +148,25 @@ class _NavItem extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(selected ? activeIcon : icon, color: color),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                color: color,
+        child: SizedBox(
+          height: 64,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(selected ? activeIcon : icon, color: color, size: 24),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  color: color,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

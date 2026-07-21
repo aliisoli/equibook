@@ -139,10 +139,10 @@ class OwnerHomeScreen extends StatelessWidget {
             ),
             SliverToBoxAdapter(
               child: SizedBox(
-                height: 118,
+                height: 132,
                 child: reminderItems.isEmpty
                     ? Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                         child: Align(
                           alignment: AlignmentDirectional.centerStart,
                           child: Text(
@@ -154,7 +154,7 @@ class OwnerHomeScreen extends StatelessWidget {
                         ),
                       )
                     : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                         scrollDirection: Axis.horizontal,
                         itemCount: reminderItems.length,
                         separatorBuilder: (_, _) => const SizedBox(width: 10),
@@ -164,7 +164,7 @@ class OwnerHomeScreen extends StatelessWidget {
                       ),
               ),
             ),
-            const SliverToBoxAdapter(child: SizedBox(height: 28)),
+            const SliverToBoxAdapter(child: SizedBox(height: 20)),
           ],
         ),
       ),
@@ -538,7 +538,7 @@ class _BookingCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  service?.title ?? s.visit,
+                  s.localizedContentTitle(service?.title ?? s.visit),
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 2),
@@ -604,9 +604,10 @@ class _ReminderCard extends StatelessWidget {
         )
         .inDays;
 
+    final title = s.localizedContentTitle(reminder.title);
     return Container(
       width: 168,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: BoxDecoration(
         color: reminderBg(reminder.kind),
         borderRadius: BorderRadius.circular(16),
@@ -614,21 +615,24 @@ class _ReminderCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(reminderIcon(reminder.kind), color: AppTheme.forest),
-          const Spacer(),
-          Text(
-            horse == null
-                ? reminder.title
-                : '${reminder.title} · ${horse.name}',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+          Icon(reminderIcon(reminder.kind), size: 22, color: AppTheme.forest),
+          const SizedBox(height: 10),
+          Expanded(
+            child: Text(
+              horse == null ? title : '$title · ${horse.name}',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+                height: 1.25,
+              ),
+            ),
           ),
-          const SizedBox(height: 4),
           Text(
             s.daysLeft(days),
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 11,
               color: AppTheme.ink.withValues(alpha: 0.65),
             ),
           ),

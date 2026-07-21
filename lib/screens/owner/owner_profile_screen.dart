@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../data/app_store.dart';
 import '../../settings/app_settings.dart';
-import '../../widgets/preferences_section.dart';
 
 class OwnerProfileScreen extends StatelessWidget {
   const OwnerProfileScreen({super.key});
@@ -25,8 +24,6 @@ class OwnerProfileScreen extends StatelessWidget {
             subtitle: Text('${user.email}\n${s.roleOwner}'),
             isThreeLine: true,
           ),
-          const Divider(),
-          const PreferencesSection(),
           const Divider(height: 32),
           ListTile(
             contentPadding: EdgeInsets.zero,

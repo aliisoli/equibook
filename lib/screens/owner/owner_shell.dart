@@ -6,9 +6,9 @@ import '../../settings/app_settings.dart';
 import '../../theme/app_theme.dart';
 import 'book_services_hub_screen.dart';
 import 'horses_screen.dart';
-import 'messages_placeholder_screen.dart';
 import 'owner_home_screen.dart';
 import 'owner_profile_screen.dart';
+import 'settings_screen.dart';
 
 class OwnerShell extends StatefulWidget {
   const OwnerShell({super.key});
@@ -28,7 +28,7 @@ class _OwnerShellState extends State<OwnerShell> {
       const OwnerHomeScreen(),
       HorsesScreen(ownerId: user.id),
       const BookServicesHubScreen(),
-      const MessagesPlaceholderScreen(),
+      const SettingsScreen(),
       const OwnerProfileScreen(),
     ];
 
@@ -65,9 +65,9 @@ class _OwnerShellState extends State<OwnerShell> {
                     ),
                     const SizedBox(width: 64),
                     _NavItem(
-                      icon: Icons.chat_bubble_outline,
-                      activeIcon: Icons.chat_bubble,
-                      label: s.messages,
+                      icon: Icons.settings_outlined,
+                      activeIcon: Icons.settings,
+                      label: s.settings,
                       selected: _index == 3,
                       onTap: () => setState(() => _index = 3),
                     ),

@@ -18,8 +18,8 @@ class AppSettings extends ChangeNotifier {
     'Tabriz',
   ];
 
-  AppLanguage language = AppLanguage.english;
-  AppCalendar calendar = AppCalendar.gregorian;
+  AppLanguage language = AppLanguage.farsi;
+  AppCalendar calendar = AppCalendar.hijriShamsi;
   String city = 'Qazvin';
   bool ready = false;
 

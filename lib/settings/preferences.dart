@@ -13,8 +13,9 @@ enum AppLanguage {
   };
 
   static AppLanguage fromCode(String? code) => switch (code) {
+    'en' => AppLanguage.english,
     'fa' => AppLanguage.farsi,
-    _ => AppLanguage.english,
+    _ => AppLanguage.farsi,
   };
 }
 
@@ -31,7 +32,8 @@ enum AppCalendar {
   };
 
   static AppCalendar fromName(String? name) => switch (name) {
+    'gregorian' => AppCalendar.gregorian,
     'hijriShamsi' => AppCalendar.hijriShamsi,
-    _ => AppCalendar.gregorian,
+    _ => AppCalendar.hijriShamsi,
   };
 }

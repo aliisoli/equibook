@@ -16,7 +16,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  testWidgets('Welcome screen shows EquiBook brand', (tester) async {
+  testWidgets('Welcome defaults to Farsi with EquiBook brand', (tester) async {
     final settings = AppSettings()..ready = true;
     final store = AppStore()..ready = true;
 
@@ -30,9 +30,15 @@ void main() {
       ),
     );
 
+    expect(settings.language, AppLanguage.farsi);
+    expect(settings.calendar, AppCalendar.hijriShamsi);
     expect(find.text('EquiBook'), findsOneWidget);
-    expect(find.text('Create account'), findsOneWidget);
-    expect(find.text('فارسی'), findsOneWidget);
+    expect(find.text('ساخت حساب'), findsOneWidget);
+    expect(find.text('هجری شمسی'), findsOneWidget);
+    expect(
+      Directionality.of(tester.element(find.text('EquiBook'))),
+      TextDirection.rtl,
+    );
   });
 
   test('Jalali and Gregorian conversion is accurate for Nowruz samples', () {
@@ -62,7 +68,7 @@ void main() {
     expect(dates.toJalali(DateTime(2021, 3, 20)), Jalali(1399, 12, 30));
   });
 
-  testWidgets('Switching to Farsi updates welcome copy and RTL', (tester) async {
+  testWidgets('Settings can switch language to English', (tester) async {
     final settings = AppSettings()..ready = true;
     final store = AppStore()..ready = true;
 
@@ -76,12 +82,15 @@ void main() {
       ),
     );
 
-    await settings.setLanguage(AppLanguage.farsi);
+    await settings.setLanguage(AppLanguage.english);
+    await settings.setCalendar(AppCalendar.gregorian);
     await tester.pumpAndSettle();
 
-    expect(find.text('ساخت حساب'), findsOneWidget);
-    expect(find.text('هجری شمسی'), findsOneWidget);
-    expect(Directionality.of(tester.element(find.text('EquiBook'))),
-        TextDirection.rtl);
+    expect(find.text('Create account'), findsOneWidget);
+    expect(find.text('Gregorian'), findsOneWidget);
+    expect(
+      Directionality.of(tester.element(find.text('EquiBook'))),
+      TextDirection.ltr,
+    );
   });
 }

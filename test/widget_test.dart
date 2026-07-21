@@ -5,6 +5,7 @@ import 'package:equibook/settings/preferences.dart';
 import 'package:equibook/utils/app_dates.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +15,7 @@ void main() {
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
+    GoogleFonts.config.allowRuntimeFetching = false;
   });
 
   testWidgets('Welcome defaults to Farsi with EquiBook brand', (tester) async {
@@ -29,6 +31,7 @@ void main() {
         child: const EquiBookApp(),
       ),
     );
+    await tester.pump();
 
     expect(settings.language, AppLanguage.farsi);
     expect(settings.calendar, AppCalendar.hijriShamsi);
@@ -45,17 +48,14 @@ void main() {
     final settings = AppSettings()..calendar = AppCalendar.hijriShamsi;
     final dates = AppDates(settings);
 
-    // 1 Farvardin 1403 = 20 March 2024
     final nowruz1403 = dates.fromJalali(Jalali(1403, 1, 1));
     expect(nowruz1403, DateTime(2024, 3, 20));
     expect(dates.toJalali(DateTime(2024, 3, 20)), Jalali(1403, 1, 1));
 
-    // 1 Farvardin 1404 = 21 March 2025
     final nowruz1404 = dates.fromJalali(Jalali(1404, 1, 1));
     expect(nowruz1404, DateTime(2025, 3, 21));
     expect(dates.toJalali(DateTime(2025, 3, 21)), Jalali(1404, 1, 1));
 
-    // Round-trip a mid-year Gregorian instant through Jalali civil day
     final mid = DateTime(2024, 7, 15, 14, 30);
     final j = dates.toJalali(mid);
     final back = dates.fromJalali(j);
@@ -63,7 +63,6 @@ void main() {
     expect(back.month, mid.month);
     expect(back.day, mid.day);
 
-    // Known leap Esfand boundary: 30 Esfand 1399 = 20 March 2021
     expect(dates.fromJalali(Jalali(1399, 12, 30)), DateTime(2021, 3, 20));
     expect(dates.toJalali(DateTime(2021, 3, 20)), Jalali(1399, 12, 30));
   });
@@ -81,6 +80,7 @@ void main() {
         child: const EquiBookApp(),
       ),
     );
+    await tester.pump();
 
     await settings.setLanguage(AppLanguage.english);
     await settings.setCalendar(AppCalendar.gregorian);
